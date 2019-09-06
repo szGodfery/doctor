@@ -1,28 +1,39 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+
+    <Header :title="title"></Header>
+    <Product-List></Product-List>
+    <Tool-Btn></Tool-Btn>
+
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from "components/header/Header";
+import ProductList from "components/productList/ProductList";
+import ToolBtn from "components/toolBtn/ToolBtn";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
-    HelloWorld
-  }
-}
+    Header,
+    ProductList,
+    ToolBtn
+  },
+  data() {
+    return {
+      title: "私人医生"
+    };
+  },
+  created() {},
+  mounted() {}
+};
 </script>
 
 <style lang="less">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+html,
+body {
+  height: 100%;
+  background-color: #f7f7f7;
 }
 </style>

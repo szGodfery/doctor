@@ -41,7 +41,7 @@ let tools = (function () {
         })
       })
     }
-  }
+  };
 
   function addParamsForUrl(url, params) {
     if (!params) return url
@@ -54,7 +54,7 @@ let tools = (function () {
         }
       }
     }
-  }
+  };
   // 判断是否为空
   function isEmpty(val) {
     if (val == null || typeof (val) == 'undefined' ||
@@ -63,12 +63,12 @@ let tools = (function () {
     } else {
       return false;
     }
-  }
+  };
 
   // 清除前后空格
   function trim(val) {
     return val.replace(/(^\s*)|(\s*$)/g, '');
-  }
+  };
 
   // 判断是安卓手机还是苹果手机
   function iosOrAndroid() {
@@ -80,17 +80,70 @@ let tools = (function () {
     } else {
       return isAndroid;
     }
-  }
+  };
   // 验证身份证
   function isIdentityCardNo(card) {
     var pattern = /(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/;
     return pattern.test(card);
-  }
+  };
   //号码验证正则
   function regPhone(phone) {
     var regPhone = /^1[3|4|5|6|7|8][0-9]{9}$/;
     return regPhone.test(phone)
-  }
+  };
+
+
+  //从 canvas 提取图片 base64 image
+  function convertCanvasToImage(canvas) {
+    //新Image对象，可以理解为DOM
+    //alert(typeof(canvas));
+    var image = new Image();
+    // canvas.toDataURL 返回的是一串Base64编码的URL，当然,浏览器自己肯定支持
+    // 指定格式 PNG
+    image.src = canvas.toDataURL("image/png");
+    return image;
+  };
+
+  // 把base64 转换成文件对象
+  function dataURLtoFile(base64Str, fileName) {
+    var arr = base64Str.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), //对base64串进行操作，去掉url头，并转换为byte
+      len = bstr.length,
+      ab = new ArrayBuffer(len), //将ASCII码小于0的转换为大于0
+      u8arr = new Uint8Array(ab);
+    while (len--) {
+      u8arr[len] = bstr.charCodeAt(len)
+    };
+    // 创建新的 File 对象实例[utf-8内容，文件名称或者路径，[可选参数，type：文件中的内容mime类型]]
+    return new File([u8arr], fileName, {
+      type: mime
+    })
+  };
+
+  /**
+ * 文件上传,异步
+ */
+  function uploadfile(file, callback) {
+    var formFile = new FormData();
+    formFile.append('file', file);
+    $.ajax({
+      type: "POST",
+      url: _urlIndex + "/file/upload",
+      data: formFile,
+      dataType: "json",
+      cache: false,
+      contentType: false, //不设置内容类型
+      processData: false, //不处理数据
+      success: function (res) {
+        callback(res)
+      },
+      error: function () {
+        showMsg('上传失败')
+      }
+    })
+  };
+
   /**
    * 显示信息用于请求回调的错误信息显示
    * 需要检查reset.css中是否有tipsBox样式
@@ -128,14 +181,68 @@ let tools = (function () {
         tipsbox.style.display = "none";
       }, time)
     }
-  }
+  };
+
+
+  /**
+ * 显示loading
+ */
+  function showLoading() {
+    var oldLoadingBox = document.getElementById("loadingBox");
+    if (oldLoadingBox != null) {
+      oldLoadingBox.style.display = 'flex';
+    } else {
+      var fragment = document.createDocumentFragment();
+      var loadingBox = document.createElement('div');
+      loadingBox.setAttribute('class', 'loadingBox');
+      loadingBox.setAttribute('id', 'loadingBox');
+      var containerStr = '<div class="spinner">' +
+        '<div class="spinner-container container1">' +
+        '<div class="circle1"></div>' +
+        '<div class="circle2"></div>' +
+        '<div class="circle3"></div>' +
+        '<div class="circle4"></div>' +
+        '</div>' +
+        '<div class="spinner-container container2">' +
+        '<div class="circle1"></div>' +
+        '<div class="circle2"></div>' +
+        '<div class="circle3"></div>' +
+        '<div class="circle4"></div>' +
+        '</div>' +
+        '<div class="spinner-container container3">' +
+        '<div class="circle1"></div>' +
+        '<div class="circle2"></div>' +
+        '<div class="circle3"></div>' +
+        '<div class="circle4"></div>' +
+        '</div>' +
+        '</div>';
+      loadingBox.innerHTML = containerStr;
+      loadingBox.style.display = 'flex';
+      fragment.appendChild(loadingBox);
+      // 把文档碎片添加到body中
+      document.body.appendChild(fragment);
+    }
+  };
+
+  /**
+   * 隐藏loading
+   */
+  function hideLoading() {
+    var loadingBox = document.getElementById('loadingBox');
+    loadingBox.style.display = 'none'
+  };
   return {
     callServer,
     isEmpty,
     iosOrAndroid,
     isIdentityCardNo,
     regPhone,
-    showMsg
+    convertCanvasToImage,
+    dataURLtoFile,
+    uploadfile,
+    showMsg,
+    showLoading,
+    hideLoading
   }
 })();
 

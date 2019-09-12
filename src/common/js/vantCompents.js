@@ -1,3 +1,10 @@
-import Vue from 'vue';
-import { Button } from "vant";
-Vue.use(Button);
+import { Lazyload, Swipe, SwipeItem } from "vant";
+
+const vantComponents = {
+  install(Vue) {
+    Vue.use(Lazyload)
+      .use(Swipe)
+      .use(SwipeItem)
+  }
+};
+export default vantComponents;

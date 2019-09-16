@@ -31,7 +31,10 @@
 
     </div>
     <!-- 保存按钮区域 -->
-    <div class="btn-area">
+    <div
+      class="btn-area"
+      v-if="!isWeiXin"
+    >
       <div
         class="save button"
         @click="savePic"
@@ -47,16 +50,18 @@
 <script>
 import html2canvas from "html2canvas";
 export default {
+  inject: ["reload"],
   data() {
     return {
       qrcodeURL: "",
-      posterImgPath: "" //海报图片
+      posterImgPath: "", //海报图片,
+      isWeiXin: false //是否是微信环境 （true是微信环境）
     };
   },
   created() {
     const { from, id, promocode } = this.$route.query;
-    const mark = this.$tools.isEmpty(localStorage.getItem("mark"))
-      ? null
+    this.mark = this.$tools.isEmpty(localStorage.getItem("mark"))
+      ? "bianlimao"
       : localStorage.getItem("mark");
     this.from = from;
     this.id = id;
@@ -67,6 +72,15 @@ export default {
   },
   mounted() {
     setTimeout(() => {
+      // 判断当前页面是否已经上传过图片了，如果有就不用调取接口
+      let urlHash = location.hash,
+        tempImgPath = null;
+      if (urlHash.indexOf("saveImageUrl") > -1) {
+        tempImgPath = urlHash.split("#saveImageUrl=")[1];
+        this.posterImgPath = tempImgPath;
+        this.$tools.hideLoading();
+        return;
+      }
       // 生成海报图片
       this.generatePoster();
     }, 300);
@@ -91,6 +105,8 @@ export default {
           break;
       }
       this.qrStr = qrStr;
+      // 如果是在微信浏览器中，就不用显示确定和取消按钮
+      this.$tools.isWeiXin() ? (this.isWeiXin = true) : null;
     },
     generatePoster() {
       let shareDOM = document.getElementById("detailSharePage"),
@@ -112,19 +128,37 @@ export default {
 
       html2canvas(shareDOM, opts).then(canvas => {
         let image = this.$tools.convertCanvasToImage(canvas);
-        this.posterImgPath = image.src;
         let myfile = this.$tools.dataURLtoFile(image.src, Date.now() + ".png");
         // 上传图片到服务器
         this.$tools.uploadfile(myfile, res => {
+          this.posterImgPath = location.host + res.path;
           this.$tools.hideLoading();
         });
       });
     },
     savePic() {
-      this.$tools.showMsg("功能正在开发，敬请期待");
+      if (this.mark == "bianlimao") {
+        let url = location.hash;
+        if (url.indexOf("&time") > -1) {
+          // 如果url中包含了time参数，也就是已经点击过了
+          url = url.replace(
+            url.substring(url.indexOf("&time"), url.length),
+            ""
+          );
+        }
+
+        url = this.$tools.addParamsForUrl(url, {
+          time: new Date().getTime() + "#saveImageUrl=" + this.posterImgPath
+        });
+        window.location.replace(url);
+        // 刷新当前页面
+        this.reload();
+      } else {
+        this.$tools.showMsg("功能正在开发，敬请期待");
+      }
     },
     cancel() {
-      this.$router.go(-1);
+      window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
     }
   }
 };

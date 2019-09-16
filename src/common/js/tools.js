@@ -42,6 +42,7 @@ let tools = (function () {
         }
       }
     }
+    return url
   };
   // 判断是否为空
   function isEmpty(val) {
@@ -212,6 +213,16 @@ let tools = (function () {
     var loadingBox = document.getElementById('loadingBox');
     loadingBox.style.display = 'none'
   };
+  // 判断是否是微信浏览器环境
+  function isWeiXin() {
+    var ua = window.navigator.userAgent.toLowerCase();
+    if (ua.match(/MicroMessenger/i) == 'micromessenger' || ua.match(/_SQ_/i) == '_sq_') {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   return {
     callServer,
     isEmpty,
@@ -223,7 +234,9 @@ let tools = (function () {
     uploadfile,
     showMsg,
     showLoading,
-    hideLoading
+    hideLoading,
+    addParamsForUrl,
+    isWeiXin
   }
 })();
 

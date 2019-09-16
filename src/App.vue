@@ -1,14 +1,29 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <router-view v-if="isRouterAlive"></router-view>
   </div>
 </template>
 
 <script>
 export default {
   name: "app",
+  provide() {
+    return {
+      reload: this.reload
+    };
+  },
   data() {
-    return {};
+    return {
+      isRouterAlive: true
+    };
+  },
+  methods: {
+    reload() {
+      this.isRouterAlive = false;
+      this.$nextTick(() => {
+        this.isRouterAlive = true;
+      });
+    }
   }
 };
 </script>
@@ -19,7 +34,7 @@ body {
   min-height: 100%;
   background-color: #f7f7f7;
 }
-#app{
+#app {
   margin: 0 auto;
   min-height: 100%;
   max-width: 7.5rem;

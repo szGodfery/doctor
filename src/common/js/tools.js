@@ -2,28 +2,16 @@
 import axios from 'axios';
 axios.defaults.timeout = 180000;
 axios.defaults.baseURL = 'http://m.dazhongdianjin.cn';
-// 设置rem方案
-!function () {
-  window.onresize = adjuest
-  adjuest();
-
-  function adjuest() {
-    //-> 按照设计稿标准比例,在根据当前屏幕的尺寸,动态的计算出当前页面的REM比例,保证在不同屏幕的下的响应式开发
-    var desW = 750;
-    var winW = document.documentElement.clientWidth;
-    document.documentElement.style.fontSize = winW / desW * 100 + 'px';
-  }
-}();
-
+const ERR_OK = 0;
 let tools = (function () {
+  // 请求数据
   function callServer(url, params, type) {
     if (!url) return;
-    url = axios.defaults.baseURL + url;
     if (type == 'get') {
       url = addParamsForUrl(url, params);
       return new Promise((resolve, reject) => {
-        axios.get(url, params).then(res => {
-          if (res.data.code == 0) {
+        axios.get(url, {}).then(res => {
+          if (res.data.code == ERR_OK) {
             resolve(res.data)
           }
         }).catch(error => {
@@ -33,7 +21,7 @@ let tools = (function () {
     } else {
       return new Promise((resolve, reject) => {
         axios.post(url, params).then(res => {
-          if (res.data.code == 0) {
+          if (res.data.code == ERR_OK) {
             resolve(res.data)
           }
         }).catch(error => {
@@ -42,7 +30,7 @@ let tools = (function () {
       })
     }
   };
-
+  // 把参数添加到url上
   function addParamsForUrl(url, params) {
     if (!params) return url
     for (var key in params) {
@@ -127,20 +115,13 @@ let tools = (function () {
   function uploadfile(file, callback) {
     var formFile = new FormData();
     formFile.append('file', file);
-    $.ajax({
-      type: "POST",
-      url: _urlIndex + "/file/upload",
-      data: formFile,
-      dataType: "json",
-      cache: false,
-      contentType: false, //不设置内容类型
-      processData: false, //不处理数据
-      success: function (res) {
-        callback(res)
-      },
-      error: function () {
-        showMsg('上传失败')
+    axios.post('/file/upload', formFile).then(res => {
+      if (res.data.code == ERR_OK) {
+        callback(res.data.data)
+      } else {
+        showMsg(res.data.msg)
       }
+    }).catch(error => {
     })
   };
 

@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import html2canvas from "html2canvas/dist/html2canvas";
+import html2canvas from "html2canvas";
 export default {
   data() {
     return {

@@ -14,7 +14,25 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-  <title>doctor_vue</title>
+  <title>平安好医生</title>
+
+  <!-- COMPUTED REM -->
+  <script>
+    ~ function () {
+      let evt = 'onorientationchange' in window ? 'orientationchange' : 'resize';
+
+      function computed() {
+        let HTML = document.documentElement,
+          deviceW = HTML.clientWidth,
+          designW = 750,
+          ratio = deviceW / designW * 100;
+        if (deviceW >= designW) ratio = 100;
+        HTML.style.fontSize = ratio + 'px';
+      }
+      computed();
+      window.addEventListener(evt, computed);
+    }();
+  </script>
 </head>
 
 <body>

@@ -20,6 +20,8 @@ body {
   background-color: #f7f7f7;
 }
 #app{
+  margin: 0 auto;
   min-height: 100%;
+  max-width: 7.5rem;
 }
 </style>

@@ -83,7 +83,7 @@ export default {
       }
       // 生成海报图片
       this.generatePoster();
-    }, 300);
+    }, 500);
   },
   methods: {
     getProductImg(from) {

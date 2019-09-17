@@ -131,7 +131,7 @@ export default {
         let myfile = this.$tools.dataURLtoFile(image.src, Date.now() + ".png");
         // 上传图片到服务器
         this.$tools.uploadfile(myfile, res => {
-          this.posterImgPath = location.host + res.path;
+          this.posterImgPath = location.origin + res.path;
           this.$tools.hideLoading();
         });
       });

@@ -55,6 +55,7 @@ export default {
     return {
       qrcodeURL: "",
       posterImgPath: "", //海报图片,
+      posterImgPathServe: "", //上传到服务器的海报图片地址
       isWeiXin: false //是否是微信环境 （true是微信环境）
     };
   },
@@ -77,6 +78,7 @@ export default {
         tempImgPath = null;
       if (urlHash.indexOf("saveImageUrl") > -1) {
         tempImgPath = urlHash.split("#saveImageUrl=")[1];
+        this.posterImgPathServe = tempImgPath;
         this.posterImgPath = tempImgPath;
         this.$tools.hideLoading();
         return;
@@ -129,9 +131,10 @@ export default {
       html2canvas(shareDOM, opts).then(canvas => {
         let image = this.$tools.convertCanvasToImage(canvas);
         let myfile = this.$tools.dataURLtoFile(image.src, Date.now() + ".png");
+        this.posterImgPath = image.src;
         // 上传图片到服务器
         this.$tools.uploadfile(myfile, res => {
-          this.posterImgPath = location.origin + res.path;
+          this.posterImgPathServe = location.origin + res.path;
           this.$tools.hideLoading();
         });
       });
@@ -148,7 +151,8 @@ export default {
         }
 
         url = this.$tools.addParamsForUrl(url, {
-          time: new Date().getTime() + "#saveImageUrl=" + this.posterImgPath
+          time:
+            new Date().getTime() + "#saveImageUrl=" + this.posterImgPathServe
         });
         window.location.replace(url);
         // 刷新当前页面
